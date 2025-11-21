@@ -114,11 +114,10 @@ def run():
         finish_prod = pulp.lpSum([(t + proc) * xvar for (xvar, t, proc) in X_sums[b]])
         depart_truck = pulp.lpSum([t * yvar for (yvar, t, _) in Y_sums[b]])
         
-        # --- Eq 7 (HARD): Sincronización Carga ---
-        # Eliminado Slack: Un camión NO puede irse antes de cargar.
+        # --- Eq 7: Sincronización Carga ---
         prob += finish_prod + wash + wait <= depart_truck, f"Eq7_Sync_b{b}"
         
-        # Eq 8 (SOFT): Vida útil (Setting Time)
+        # --- Eq 8: Vida útil (Setting Time)
         site_id = str(batches[b]["site_id"]).strip().lower()
         travel = float(sites_map.get(site_id, {}).get("travel_time_min", 0))
         arrival_finish = depart_truck + travel + unload
