@@ -127,7 +127,7 @@ def run():
         tw_end = get_minutes(sites_map.get(site_id, {}).get("tw_end_h"))
         prob += T_tard[b] >= (depart_truck + travel + unload) - tw_end, f"Def_Tard_b{b}"
         
-        # Límite Tardanza (SOFT)
+        # Límite Tardanza
         prob += T_tard[b] <= max_tardiness + Slacks_MaxTard[b], f"Limit_Tard_b{b}"
 
     # Capacidad Unidades
