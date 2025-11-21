@@ -162,11 +162,11 @@ A continuación se detallan las dimensiones del modelo matemático (variables y 
 
 | Métrica | Paper Original (Tibaldo et al., 2025) | Nuestra Réplica (Highs/ARM64) |
 | :--- | :--- | :--- |
-| **Total Variables** | [cite_start]23,550 [cite: 1732] | 52,841 |
+| **Total Variables** | 23,550 | 52,841 |
 | **Variables Binarias** | *No especificado* | 52,684 |
 | **Variables Continuas** | *No especificado* | 157 |
-| **Restricciones** | [cite_start]3,344 [cite: 1732] | 2,081 |
-| **Gap de Optimalidad** | [cite_start]0% [cite: 1732] | 0.01% |
+| **Restricciones** | 3,344  | 2,081 |
+| **Gap de Optimalidad** | 0% [cite: 1732] | 0.01% |
 
 > **Nota Técnica sobre las Dimensiones:**
 > * **Variables:** Nuestra réplica genera aproximadamente el doble de variables que el paper. Esto es intencional: utilizamos una estrategia de generación de variables "robusta" (Safety Net) que cubre todo el horizonte de tiempo $[T_1, T_2]$ con una discretización de $\Delta t=10$ min, en lugar de podar agresivamente el dominio (como sugieren los Algoritmos 2 y 3 del paper). Esto garantiza la factibilidad matemática ante datos reales ruidosos a cambio de un mayor consumo de memoria.
