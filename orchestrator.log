@@ -1,0 +1,285 @@
+ubuntu@ratonmalo31:~/IO$ python3 orchestrator.py
+Tablas requeridas y columnas (plantilla):
+
+1) construction_sites.csv -> columns: site_id, demand_m3, tw_start_h, tw_end_h, concrete_type, dist_km, travel_time_min
+2) trucks.csv -> columns: truck_id, capacity_m3, min_load_m3, fixed_cost, var_cost_per_km
+3) units.csv -> columns: unit_id, process_time_min, capacity_m3 (if needed)
+4) parameters.json -> JSON con wash_time_min, unload_time_min, wait_before_departure_min, T1, T2, setting_time_min, max_tardiness_allowed, alpha, beta
+✅ Datos cargados correctamente:
+
+Sitios: (27, 7)
+Camiones: (27, 5)
+Unidades: (2, 3)
+
+Parámetros globales:
+{
+  "T1": 420,
+  "T2": 1020,
+  "wash_time": 10,
+  "unload_time": 30,
+  "wait_before_departure": 0,
+  "setting_time": 90,
+  "max_tardiness_allowed": 120,
+  "alpha": 1.0,
+  "beta": 1.0
+}
+Max truck capacity: 8
+Min truck min-load: 2
+Batches generated: 46
+Small batches to merge: 0
+No small batches found; no merge required.
+Removing oversized batches: []
+=== CELDA 7: CONSTRUCCIÓN MODELO (OPTIMIZADO: HARD PHYS + LOW M) ===
+Generando variables para 46 lotes...
+Agregando restricciones (Hard Constraints aplicadas)...
+Modelo Optimizado Guardado (M=10k, HardSync, HardSeq).
+
+=== CELDA 8 (Repair v4 - Slacks Injection Final): Inicio ===
+Variables recuperadas: 46 lotes.
+Construyendo solución factible (Modo Agresivo)...
+Heurística completada. Lotes asignados: 46/46
+Inyectando Warm Start con Slacks calculados...
+=== CELDA 8: Fin (Solución Inicial Completa con Slacks) ===
+
+
+========== CELDA 9: RECONSTRUCCIÓN DE SOLUCIÓN ==========
+
+Variables cargadas desde data.shared.
+Extrayendo solución entera actual del solver...
+X_sol: 46 Y_sol: 46
+
+--- Reconstruyendo producción por unidad ---
+   batch  unit site_id  start_min  finish_min  volume_m3
+0      0     1      i1        420         435        8.0
+1      1     1      i1        440         455        8.0
+2      2     1      i2        700         715        8.0
+3      3     0      i2        720         750        3.0
+4      4     1      i3        860         875        8.0
+
+--- Reconstruyendo asignación de camiones ---
+   batch truck site_id  depart_time_min  volume_m3  travel_time_min
+0      0   v12      i1              450        8.0               12
+1      1   v13      i1              480        8.0               12
+2      2   v21      i2              730        8.0               30
+3      3    v4      i2              760        3.0               30
+4      4   v11      i3              890        8.0               18
+
+--- Calculando tardiness report ---
+   batch site_id  tardiness_min
+0      0      i1            0.0
+1      1      i1            0.0
+2      2      i2            0.0
+3      3      i2           10.0
+4      4      i3            0.0
+
+--- Calculando resumen de costos ---
+{'truck_cost': 9620, 'tardiness_cost': np.float64(348.0), 'total_cost': np.float64(19588.0)}
+
+========== FIN CELDA 9 ==========
+
+
+=== CELDA 11: INICIO SOLVE MILP COMPLETO (HIGHS 4-CORES) ===
+Problema MILP cargado: ~52730 variables, 2081 restricciones.
+Warm Start (Solución Heurística) ya inyectado en las variables por Cell 8.
+✅ Librería Python 'highspy' detectada.
+Iniciando optimización con 4 hilos (si Highs está disponible)...
+Running HiGHS 1.12.0 (git hash: 755a8e0): Copyright (c) 2025 HiGHS under MIT licence terms
+MIP has 2081 rows; 52841 cols; 651233 nonzeros; 52684 integer variables (52684 binary)
+Coefficient ranges:
+  Matrix  [1e+00, 1e+03]
+  Cost    [1e+00, 1e+03]
+  Bound   [1e+00, 1e+00]
+  RHS     [1e+00, 1e+03]
+Presolving model
+2081 rows, 52814 cols, 651233 nonzeros  0s
+1939 rows, 52065 cols, 624377 nonzeros  29s
+Presolve reductions: rows 1939(-142); columns 52065(-776); nonzeros 624377(-26856) 
+
+Solving MIP model with:
+   1939 rows
+   52065 cols (51908 binary, 0 integer, 65 implied int., 92 continuous, 0 domain fixed)
+   624377 nonzeros
+
+Src: B => Branching; C => Central rounding; F => Feasibility pump; H => Heuristic;
+     I => Shifting; J => Feasibility jump; L => Sub-MIP; P => Empty MIP; R => Randomized rounding;
+     S => Solve LP; T => Evaluate node; U => Unbounded; X => User solution; Y => HiGHS solution;
+     Z => ZI Round; l => Trivial lower; p => Trivial point; u => Trivial upper; z => Trivial zero
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   0               inf                  inf        0      0      0         0    34.0s
+         0       0         0   0.00%   13362.5         inf                  inf        0      0      2      3825    35.8s
+         0       0         0   0.00%   13383.649559    inf                  inf     1033    153      8     10372    43.8s
+         0       0         0   0.00%   13393.628461    inf                  inf     1531    262     12     15153    53.4s
+         0       0         0   0.00%   13400.154571    inf                  inf     1919    350     23     18849    62.7s
+         0       0         0   0.00%   13401.476412    inf                  inf     2107    389     25     21892    68.5s
+         0       0         0   0.00%   13403.012928    inf                  inf     2271    426     27     25243    74.3s
+         0       0         0   0.00%   13407.229617    inf                  inf     2620    484     33     30727    83.9s
+         0       0         0   0.00%   13409.047549    inf                  inf     2782    518     36     34769    91.0s
+         0       0         0   0.00%   13409.693051    inf                  inf     3159    585     40     37632   100.1s
+         0       0         0   0.00%   13411.915661    inf                  inf     3492    482     44     39958   109.5s
+         0       0         0   0.00%   13413.408731    inf                  inf     3818    532     48     45945   120.8s
+         0       0         0   0.00%   13416.129629    inf                  inf     4090    574     52     48682   127.1s
+         0       0         0   0.00%   13418.203533    inf                  inf     4408    469     57     49878   134.1s
+         0       0         0   0.00%   13424.46451     inf                  inf     4604    521     61     54704   144.9s
+         0       0         0   0.00%   13428.300988    inf                  inf     4856    475     67     58486   155.0s
+         0       0         0   0.00%   13436.462228    inf                  inf     4955    540     70     62580   163.2s
+         0       0         0   0.00%   13445.80932     inf                  inf     5361    656     74     67143   175.7s
+         0       0         0   0.00%   13456.301614    inf                  inf     5579    717     76     70566   182.6s
+         0       0         0   0.00%   13463.153266    inf                  inf     5760    660     79     72797   189.2s
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   13470.390751    inf                  inf     5533    712     81     78072   199.4s
+         0       0         0   0.00%   13477.912462    inf                  inf     5585    767     83     81489   206.4s
+         0       0         0   0.00%   13483.434529    inf                  inf     5619    820     85     84572   213.4s
+         0       0         0   0.00%   13487.214568    inf                  inf     5610    879     87     87878   221.0s
+         0       0         0   0.00%   13490.142431    inf                  inf     5701    809     89     89930   227.9s
+         0       0         0   0.00%   13496.632195    inf                  inf     5728    864     91     92955   235.3s
+         0       0         0   0.00%   13500.973295    inf                  inf     5797    923     93     96630   243.3s
+         0       0         0   0.00%   13507.541045    inf                  inf     5880    980     95     99669   250.5s
+         0       0         0   0.00%   13514.751863    inf                  inf     6015   1033     98    104128   260.3s
+         0       0         0   0.00%   13518.110512    inf                  inf     6071    918    100    107608   268.4s
+         0       0         0   0.00%   13521.292862    inf                  inf     6109    972    102    111247   277.0s
+         0       0         0   0.00%   13524.196273    inf                  inf     6183   1020    106    114464   284.8s
+         0       0         0   0.00%   13526.057776    inf                  inf     6239   1065    108    116496   291.0s
+         0       0         0   0.00%   13529.686608    inf                  inf     6100   1104    110    119862   299.2s
+         0       0         0   0.00%   13531.717248    inf                  inf     6175   1005    112    122326   306.0s
+         0       0         0   0.00%   13534.484331    inf                  inf     6198   1046    114    124117   311.9s
+         0       0         0   0.00%   13537.739554    inf                  inf     6162   1085    117    127235   319.7s
+         0       0         0   0.00%   13542.376507    inf                  inf     6248   1128    119    130079   327.3s
+         0       0         0   0.00%   13546.2567      inf                  inf     6161   1174    123    133670   335.9s
+         0       0         0   0.00%   13548.237384    inf                  inf     6247   1015    126    135896   341.9s
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+         0       0         0   0.00%   13549.473462    inf                  inf     6259   1051    128    137887   347.5s
+         0       0         0   0.00%   13550.607335    inf                  inf     6307   1091    130    139442   352.5s
+         0       0         0   0.00%   13552.854757    inf                  inf     6317   1130    132    142693   360.7s
+         0       0         0   0.00%   13553.970729    inf                  inf     6221   1168    134    144551   366.0s
+         0       0         0   0.00%   13554.948988    inf                  inf     6138   1037    136    147909   374.1s
+         0       0         0   0.00%   13555.6804      inf                  inf     6059   1086    138    151409   382.5s
+         0       0         0   0.00%   13556.794408    inf                  inf     5985   1128    140    154049   389.1s
+         0       0         0   0.00%   13558.560807    inf                  inf     5893   1169    142    156765   395.5s
+         0       0         0   0.00%   13559.748287    inf                  inf     5711   1212    144    159872   403.2s
+         0       0         0   0.00%   13560.990829    inf                  inf     5728   1085    146    163938   412.3s
+         0       0         0   0.00%   13561.730969    inf                  inf     5757   1141    151    165984   420.6s
+         0       0         0   0.00%   13562.241778    inf                  inf     5810   1169    154    167311   425.7s
+         0       0         0   0.00%   13562.413707    inf                  inf     5621   1093    161    168302   431.4s
+ L       0       0         0   0.00%   13562.464177    35774             62.09%     5541   1107    163    169395   544.9s
+
+0.6% inactive integer columns, restarting
+Model after restart has 1935 rows, 36712 cols (36555 bin., 0 int., 65 impl., 92 cont., 0 dom.fix.), and 442516 nonzeros
+
+         0       0         0   0.00%   13562.47456     35774             62.09%      615      0      0    202703   616.7s
+         0       0         0   0.00%   13562.614096    35774             62.09%      615    494      2    227368   638.5s
+         0       0         0   0.00%   13566.90499     35774             62.08%      978    571      2    232334   646.0s
+         0       0         0   0.00%   13567.641907    35774             62.07%     1183    622      2    236828   654.1s
+         0       0         0   0.00%   13567.862104    35774             62.07%     1356    672      2    239333   660.3s
+        13       1         1   0.02%   13567.862104    35774             62.07%     1356    529     59    251016   672.6s
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+        58       1        12   0.06%   13567.862104    35774             62.07%     1372    529    325    294694   713.9s
+        69       3        13   0.06%   13567.862104    35774             62.07%     1374    529    379    302307   722.3s
+ T      90       9        19   0.06%   13567.862104    33885             59.96%     1374    529    506    302604   724.1s
+ L     104       6        23   0.78%   13567.862104    13591              0.17%     1922    695    624    332553   882.1s
+       113       9        26  22.66%   13567.862104    13591              0.17%     1925    695    718    380864   889.9s
+       123      10        28  24.27%   13567.862104    13591              0.17%     1927    695    779    388657   899.3s
+       135      19        29  24.66%   13568.75653     13591              0.16%     2245    627    941    402474   921.4s
+       149      30        31  26.30%   13570.439862    13591              0.15%     2348    612   1094    417323   940.9s
+       163      34        36  31.47%   13574.299372    13591              0.12%     2422    630   1194    431419   957.4s
+       164      33        37  37.72%   13575.304744    13591              0.12%     2517    654   1225    437596   964.6s
+       172      25        45  40.68%   13575.304744    13591              0.12%     2521    654   1291    442237   970.1s
+       175      24        46  41.47%   13575.328567    13591              0.12%     3057    639   1326    466171  1000.7s
+       183      17        53  46.70%   13575.328567    13591              0.12%     3316    663   1394    477112  1015.9s
+       194      19        56  46.95%   13575.328567    13591              0.12%     3319    663   1499    481065  1020.9s
+       222      25        63  46.95%   13575.328567    13591              0.12%     3326    663   1673    484390  1026.2s
+       231      33        68  50.08%   13575.328567    13591              0.12%     3502    579   1692    496407  1040.0s
+       243      34        70  50.13%   13575.328567    13591              0.12%     3504    579   1760    501983  1046.6s
+ T     262      47        75  50.13%   13575.38037     13591              0.11%     3515    581   1788    504586  1051.1s
+ T     282      51        83  50.13%   13575.38037     13591              0.11%     3520    581   1807    505077  1053.1s
+       309      50        98  50.13%   13575.38037     13591              0.11%     3435    439   1886    506722  1058.2s
+
+        Nodes      |    B&B Tree     |            Objective Bounds              |  Dynamic Constraints |       Work      
+Src  Proc. InQueue |  Leaves   Expl. | BestBound       BestSol              Gap |   Cuts   InLp Confl. | LpIters     Time
+
+       313      46       101  51.69%   13575.38482     13591              0.11%     3749    632   1940    534707  1092.6s
+       320      39       107  51.71%   13575.38482     13591              0.11%     3748    647   1941    538223  1098.0s
+       323      36       110  54.86%   13575.9915      13591              0.11%     3749    647   1949    546219  1105.0s
+       329      30       116  55.19%   13575.9915      13591              0.11%     3751    647   1976    552795  1111.7s
+       333      26       119  55.97%   13576.019203    13591              0.11%     3757    590   2009    564827  1124.9s
+       340      19       126  56.47%   13576.019203    13591              0.11%     3764    590   2015    571489  1132.5s
+       343      16       128  69.75%   13576.097322    13591              0.11%     3769    603   2025    578645  1140.1s
+       344      15       129  71.31%   13576.097322    13591              0.11%     3769    603   2044    593016  1156.2s
+       352       7       137  94.63%   13576.097322    13591              0.11%     3774    603   2095    598123  1161.3s
+       355       4       140  96.68%   13580.421785    13591              0.08%     3775    603   2112    602723  1167.1s
+       359       0       144 100.00%   13589.666667    13591              0.01%     3776    603   2131    604651  1171.8s
+
+Solving report
+  Status            Optimal
+  Primal bound      13590.9999996
+  Dual bound        13589.6666667
+  Gap               0.00981% (tolerance: 0.01%)
+  P-D integral      206.340026563
+  Solution status   feasible
+                    13590.9999996 (objective)
+                    0 (bound viol.)
+                    6.50721787565e-09 (int. viol.)
+                    0 (row viol.)
+  Timing            1171.78
+  Max sub-MIP depth 6
+  Nodes             359
+  Repair LPs        0
+  LP iterations     604651
+                    43906 (strong br.)
+                    271589 (separation)
+                    74019 (heuristics)
+✅ Solver finalizado. Generando reporte de cell9_report.py inmediato...
+
+=== CELDA 9: REPORTE DE DIAGNÓSTICO ===
+Estado del Solver: Optimal
+Función Objetivo Final: 13,591.00
+
+--- 🚨 DESGLOSE DE VIOLACIONES (SLACKS) ---
+✅ ¡CERO VIOLACIONES! La solución es perfecta en calidad.
+
+--- 🚚 RESUMEN LOGÍSTICO ---
+Total Viajes Asignados: 46 / 46
+  - Lote 20 -> Camión 24 sale a las 450 min hacia i14
+  - Lote 6 -> Camión 10 sale a las 460 min hacia i4
+  - Lote 33 -> Camión 25 sale a las 470 min hacia i21
+  - Lote 0 -> Camión 21 sale a las 490 min hacia i1
+  - Lote 42 -> Camión 11 sale a las 490 min hacia i26
+
+=== FIN REPORTE ===
+
+--- SOLVER FINALIZADO ---
+Estado Final: Optimal
+Tiempo Total: 1177.17 segundos
+Costo Objetivo: 13590.999999566739
+Guardando solución óptima en data.shared...
+Resumen Solución: 46 lotes producidos, 46 lotes transportados.
+Flota utilizada: 14 camiones.
+=== CELDA 11: FIN ===
+
+========== CELDA 10: CHECKER DE FACTIBILIDAD ==========
+X_sol = 46, Y_sol = 46
+Overlap en unidades: 0
+Violaciones depart>=finish+wait+wash (Eq. 7): 0
+Conflictos de doble uso del camión: 0
+Violaciones de capacidad: 0
+Inconsistencias V_used: 14
+Tardiness inconsistencias (Eq. 18): 0
+Violaciones de solapamiento de descarga (Eq. 13): 0
+Violaciones de max time lag (Eq. 14): 0
+Violaciones de setting time (Eq. 8): 0
+========== FIN CELDA 10 ==========
+
+=== CELDA 12: GENERANDO DIAGRAMA DE GANTT (Carga, Espera, Lavado, Viaje, Descarga) ===
+Diagrama de Gantt detallado guardado en: gantt_optimal_schedule_full.png
+ubuntu@ratonmalo31:~/IO$ 

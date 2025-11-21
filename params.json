@@ -1,0 +1,11 @@
+{
+  "T1": 420,
+  "T2": 1020,
+  "wash_time": 10,
+  "unload_time": 30,
+  "wait_before_departure": 0,
+  "setting_time": 90,
+  "max_tardiness_allowed": 120,
+  "alpha": 1.0,
+  "beta": 1.0
+}
