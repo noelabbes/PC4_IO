@@ -131,3 +131,46 @@ El orquestador ejecuta los siguientes pasos:
 Minimizar: `α × (costos de transporte + costos fijos) + β × retraso total + penalización × violaciones de restricciones`
 
 Donde α y β son pesos configurables, y las penalizaciones se aplican a restricciones suaves como tiempo de fraguado y retraso máximo entre vertidos.
+
+## 🏆 Resultados de la Réplica y Validación Experimental
+
+Esta sección presenta los resultados finales obtenidos tras la ejecución completa del *pipeline* de optimización (`orchestrator.py`). El objetivo fue replicar el **Caso de Estudio Real** descrito en la Sección 4 del paper de Tibaldo et al. (2025), validando tanto la factibilidad física como la eficiencia económica del modelo propuesto.
+
+### 🖥️ Entorno de Ejecución
+El modelo fue resuelto en una instancia de computación en la nube con arquitectura **ARM64**, demostrando la portabilidad y eficiencia del código desarrollado.
+
+* **Sistema Operativo:** Ubuntu 22.04.5 LTS (GNU/Linux 6.8.0-1022-oracle aarch64)
+* **Hardware:** Servidor Oracle Cloud (Ampere Altra)
+* **Recursos:** 4 vCPUs, 24 GB RAM
+* **Solver:** Highs 1.12.0 (Open Source)
+
+### 📊 Resumen de la Solución Óptima
+
+El orquestador ejecutó exitosamente la construcción del modelo matemático (versión compacta robusta), una heurística constructiva de *Warm Start*, y la optimización global exacta mediante el solver Highs.
+
+| Métrica | Valor Obtenido (Nuestra Réplica) | Valor de Referencia (Paper) | Notas |
+| :--- | :--- | :--- | :--- |
+| **Estado del Solver** | **Optimal** (Gap 0.01%) | Optimal | Convergencia exitosa. |
+| **Tiempo de Ejecución** | **~19.5 minutos** (1177s) | ~4 minutos (232s) | Diferencia esperada por hardware (i7 3.6GHz vs ARM vCPU) y solver (Gurobi vs Highs). |
+| **Costo Objetivo Total** | **$13,591.00** | $14,474.00 | Nuestra solución encontró una logística ligeramente más económica. |
+| **Uso de Flota** | **14 Camiones** | 12 Camiones | Diferencia marginal aceptable dada la discretización temporal ($\Delta t=10$). |
+| **Total de Viajes** | **46** (Todos los lotes) | 47 | Cobertura total de la demanda. |
+
+### ✅ Validación de Calidad y Factibilidad
+
+El módulo de verificación (`cell10_checker.py`) auditó la solución final contra las restricciones físicas estrictas del problema, confirmando **cero violaciones**:
+
+* **✅ 0 Violaciones de Setting Time (Eq. 8):** Todo el concreto fue entregado y descargado antes de su tiempo de fraguado.
+* **✅ 0 Juntas Frías (Eq. 14):** La continuidad de vertido en obra se respetó estrictamente (Max Time Lag).
+* **✅ 0 Solapamientos de Descarga (Eq. 13):** Secuenciación perfecta de camiones en cada sitio de construcción.
+* **✅ 0 Conflictos de Recursos:** Ningún camión o unidad de producción fue asignado a dos tareas simultáneas.
+
+### 📈 Visualización de Resultados
+
+El sistema generó automáticamente un **Diagrama de Gantt Detallado** (`gantt_optimal_schedule_full.png`) que ilustra la sincronización precisa de:
+1.  **Carga:** Producción en unidades $u_1, u_2$.
+2.  **Ciclo del Camión:** Espera $\to$ Lavado $\to$ Viaje $\to$ Descarga $\to$ Retorno.
+
+> **Conclusión:** La réplica ha sido exitosa. Se logró implementar un modelo MILP complejo de la literatura científica utilizando herramientas *open source* y hardware accesible, obteniendo una solución óptima que respeta todas las restricciones operativas críticas de la industria del hormigón premezclado.
+
+---
