@@ -156,6 +156,22 @@ El orquestador ejecutó exitosamente la construcción del modelo matemático (ve
 | **Uso de Flota** | **14 Camiones** | 12 Camiones | Diferencia marginal aceptable dada la discretización temporal ($\Delta t=10$). |
 | **Total de Viajes** | **46** (Todos los lotes) | 47 | Cobertura total de la demanda. |
 
+### 📉 Estadísticas del Modelo: Comparativa Paper vs. Réplica
+
+A continuación se detallan las dimensiones del modelo matemático (variables y restricciones) reportadas por los autores para el Caso de Estudio, comparadas con las generadas por nuestra implementación.
+
+| Métrica | Paper Original (Tibaldo et al., 2025) | Nuestra Réplica (Highs/ARM64) |
+| :--- | :--- | :--- |
+| **Total Variables** | [cite_start]23,550 [cite: 1732] | 52,841 |
+| **Variables Binarias** | *No especificado* | 52,684 |
+| **Variables Continuas** | *No especificado* | 157 |
+| **Restricciones** | [cite_start]3,344 [cite: 1732] | 2,081 |
+| **Gap de Optimalidad** | [cite_start]0% [cite: 1732] | 0.01% |
+
+> **Nota Técnica sobre las Dimensiones:**
+> * **Variables:** Nuestra réplica genera aproximadamente el doble de variables que el paper. Esto es intencional: utilizamos una estrategia de generación de variables "robusta" (Safety Net) que cubre todo el horizonte de tiempo $[T_1, T_2]$ con una discretización de $\Delta t=10$ min, en lugar de podar agresivamente el dominio (como sugieren los Algoritmos 2 y 3 del paper). Esto garantiza la factibilidad matemática ante datos reales ruidosos a cambio de un mayor consumo de memoria.
+> * **Restricciones:** A pesar de tener más variables, nuestro modelo utiliza **menos restricciones** (2,081 vs 3,344). Esto se debe a la implementación de una formulación **compacta** para las ecuaciones de sincronización y capacidad, aprovechando las capacidades de presolve del solver Highs.
+
 ### ✅ Validación de Calidad y Factibilidad
 
 El módulo de verificación (`cell10_checker.py`) auditó la solución final contra las restricciones físicas estrictas del problema, confirmando **cero violaciones**:
