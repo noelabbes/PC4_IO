@@ -1,5 +1,5 @@
 # cell7.py -- Replica Paper Compacta v7 (Optimized: Reduced M + Hard Phys Constraints)
-import data
+from src import context as data
 import pulp
 import math
 import pandas as pd

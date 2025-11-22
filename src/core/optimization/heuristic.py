@@ -1,5 +1,5 @@
 # cell8_repair_v4.py -- Heurística Robusta Final (Cleaned for Hard Constraints)
-import data
+from src import context as data
 import pulp
 from copy import deepcopy
 from collections import defaultdict

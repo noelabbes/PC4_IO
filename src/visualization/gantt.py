@@ -4,7 +4,8 @@ import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 import pandas as pd
 import numpy as np
-import data
+from src import context as data
+import os
 
 def minutes_to_hhmm(minutes):
     """Convierte minutos absolutos (ej. 480) a formato hora (08:00)."""
@@ -240,7 +241,14 @@ def run():
     fig.legend(handles=legend_patches, loc='upper center', bbox_to_anchor=(0.5, 0.06), ncol=6, fontsize='small')
 
     plt.tight_layout(rect=[0, 0.07, 1, 1])
-    filename = "gantt_optimal_schedule_full.png"
+    
+    # Save to output directory
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__))) # project root
+    output_dir = os.path.join(base_dir, "output")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
+    filename = os.path.join(output_dir, "gantt_optimal_schedule_full.png")
     plt.savefig(filename, dpi=150)
     print(f"Diagrama de Gantt detallado guardado en: {filename}")
     plt.close()

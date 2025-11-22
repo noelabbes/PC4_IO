@@ -1,5 +1,5 @@
 # cell9_report.py -- Diagnóstico de Solución
-import data
+from src import context as data
 import pulp
 import pandas as pd
 
@@ -22,7 +22,7 @@ def run():
     print(f"Función Objetivo Final: {pulp.value(prob.objective):,.2f}")
 
     # 1. Análisis de Slacks (¿Por qué cuesta 20 Millones?)
-    print("\n--- 🚨 DESGLOSE DE VIOLACIONES (SLACKS) ---")
+    print("\n--- [ALERT] DESGLOSE DE VIOLACIONES (SLACKS) ---")
     total_slack_min = 0
     
     active_slacks = []
@@ -35,15 +35,15 @@ def run():
     active_slacks.sort(key=lambda x: x[1], reverse=True)
     
     if not active_slacks:
-        print("✅ ¡CERO VIOLACIONES! La solución es perfecta en calidad.")
+        print("[OK] ¡CERO VIOLACIONES! La solución es perfecta en calidad.")
     else:
         print(f"Total minutos de violación: {total_slack_min:.1f} min")
         print("Top 10 peores violaciones:")
         for name, val in active_slacks[:10]:
-            print(f"  🔴 {name}: {val:.1f} min")
+            print(f"  [FAIL] {name}: {val:.1f} min")
 
     # 2. Análisis de Transporte
-    print("\n--- 🚚 RESUMEN LOGÍSTICO ---")
+    print("\n--- [TRUCK] RESUMEN LOGÍSTICO ---")
     trips = []
     for (b, v, t), var in Y.items():
         if var.varValue and var.varValue > 0.5:
