@@ -1,4 +1,4 @@
-import data
+from src import context as data
 
 def run():
     # Celda 2: imports y utilidades

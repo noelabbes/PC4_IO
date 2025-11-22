@@ -12,45 +12,57 @@ Este proyecto implementa un sistema avanzado de optimización para la logística
 - **Verificación de Factibilidad**: Valida restricciones de la solución e identifica violaciones
 - **Generación de Diagrama de Gantt**: Produce horarios visuales mostrando cronogramas de producción y entrega
 
-## Requisitos
+## Arquitectura del Proyecto
 
-- Python 3.7+
-- PuLP (biblioteca de modelado de optimización)
-- pandas
-- numpy
-- tabulate
-- HiGHS solver (via highspy para rendimiento óptimo)
+El proyecto ha sido reestructurado en una arquitectura modular para mejorar la escalabilidad y el mantenimiento:
+
+```
+project_root/
+├── src/                    # Código fuente principal
+│   ├── data/               # Módulos de carga y validación de datos (loader.py, schema.py)
+│   ├── core/               # Lógica de negocio y optimización
+│   │   ├── optimization/   # Modelos MILP, heurísticas y solvers
+│   │   ├── batching.py     # Generación de lotes
+│   │   ├── analysis.py     # Análisis de soluciones
+│   │   ├── reporting.py    # Generación de reportes
+│   │   └── validation.py   # Verificación de restricciones
+│   ├── visualization/      # Generación de gráficos (Gantt)
+│   ├── context.py          # Gestión de estado compartido
+│   ├── config.py           # Configuración del sistema
+│   └── main.py             # Punto de entrada principal
+├── input/                  # Archivos de datos de entrada (CSV, JSON)
+├── output/                 # Resultados generados (Logs, Gráficos)
+└── requirements.txt        # Dependencias del proyecto
+```
 
 ## Instalación
 
-1. Clona o descarga los archivos del proyecto
+1. Clona o descarga los archivos del proyecto.
 2. Instala los paquetes requeridos:
    ```bash
-   pip install pulp pandas numpy tabulate highspy
+   pip install -r requirements.txt
+   ```
+   O manualmente:
+   ```bash
+   pip install pulp pandas numpy tabulate highspy matplotlib
    ```
 
 ## Uso
 
-1. Prepara archivos de datos de entrada en formato CSV:
-   - `construction_sites.csv`: Información de sitios con demandas y ventanas de tiempo
-   - `trucks.csv`: Detalles de la flota de camiones con capacidades y costos
-   - `units.csv`: Especificaciones de unidades de producción
+1. **Preparar Datos**: Asegúrate de que los archivos de entrada estén en la carpeta `input/`:
+   - `construction_sites.csv`
+   - `trucks.csv`
+   - `units.csv`
+   - `params.json`
 
-2. Configura parámetros en `params.json`:
-   - Ventanas de tiempo (T1, T2)
-   - Tiempos de procesamiento (wash_time, unload_time, etc.)
-   - Pesos de costos (alpha, beta)
-
-3. Ejecuta el orquestador:
+2. **Ejecutar**: Desde la raíz del proyecto, ejecuta el módulo principal:
    ```bash
-   python orchestrator.py
+   python -m src.main
    ```
 
-El sistema ejecutará el pipeline de optimización y generará:
-- Horario óptimo de producción y entrega
-- Desglose de costos
-- Reporte de factibilidad
-- Diagrama de Gantt (`gantt_optimal_schedule_full.png`)
+3. **Resultados**: Revisa la carpeta `output/` para ver:
+   - `gantt_optimal_schedule_full.png`: Diagrama de Gantt.
+   - Logs de ejecución y reportes en consola.
 
 ## Formatos de Datos
 
@@ -98,24 +110,16 @@ El sistema ejecutará el pipeline de optimización y generará:
 
 ## Resumen del Pipeline
 
-El orquestador ejecuta los siguientes pasos:
+El sistema ejecuta los siguientes pasos secuenciales:
 
-1. **Cell 2**: Importa utilidades y muestra requisitos de datos
-2. **Cell 5**: Carga y valida datos de entrada
-3. **Cell 6**: Genera lotes a partir de demandas de sitios
-4. **Cell 7**: Construye modelo MILP optimizado con restricciones físicas duras
-5. **Cell 8**: Genera solución heurística con variables de holgura
-6. **Cell 9**: Reconstruye y analiza la solución óptima
-7. **Cell 11**: Resuelve MILP completo usando solver HiGHS
-8. **Cell 10**: Valida factibilidad de la solución
-9. **Cell 12**: Genera visualización de diagrama de Gantt
-
-## Salidas
-
-- **Logs de Consola**: Progreso detallado de ejecución y resultados
-- **orchestrator.log**: Log completo de ejecución
-- **gantt_optimal_schedule_full.png**: Diagrama visual de horario
-- **Datos Compartidos**: Horarios optimizados y resúmenes de costos en memoria
+1. **Carga de Datos**: `src.data.loader` lee y valida los archivos CSV/JSON.
+2. **Batching**: `src.core.batching` divide la demanda en lotes de producción.
+3. **Modelado**: `src.core.optimization.model` construye el modelo matemático MILP.
+4. **Heurística**: `src.core.optimization.heuristic` genera una solución inicial (Warm Start).
+5. **Optimización**: `src.core.optimization.solver` resuelve el problema usando HiGHS.
+6. **Validación**: `src.core.validation` verifica el cumplimiento de todas las restricciones.
+7. **Reporte**: `src.core.reporting` genera métricas de desempeño.
+8. **Visualización**: `src.visualization.gantt` crea el diagrama de Gantt en `output/`.
 
 ## Restricciones Clave
 
@@ -130,7 +134,7 @@ El orquestador ejecuta los siguientes pasos:
 
 Minimizar: `α × (costos de transporte + costos fijos) + β × retraso total + penalización × violaciones de restricciones`
 
-Donde α y β son pesos configurables, y las penalizaciones se aplican a restricciones suaves como tiempo de fraguado y retraso máximo entre vertidos.
+Donde α y β son pesos configurables.
 
 ## 🏆 Resultados de la Réplica y Validación Experimental
 

@@ -1,10 +1,9 @@
-# cell11_solve_milp.py -- Versión Highs/ARM64 Compatible
-import data
+from src import context as data
 import pulp
 import time
 import shutil
 import os
-import cell9_report
+from src.core import reporting
 
 def run():
     print("\n=== CELDA 11: INICIO SOLVE MILP COMPLETO (HIGHS 4-CORES) ===")
@@ -38,7 +37,7 @@ def run():
 
     # Estrategia de Selección de Solver Robusta
     if shutil.which("highs"):
-        print("✅ Ejecutable 'highs' detectado en sistema.")
+        print("[OK] Ejecutable 'highs' detectado en sistema.")
         # Highs CMD soporta threads y log path
         solver = pulp.HiGHS_CMD(
             timeLimit=time_limit_sec,
@@ -49,7 +48,7 @@ def run():
     else:
         try:
             import highspy
-            print("✅ Librería Python 'highspy' detectada.")
+            print("[OK] Librería Python 'highspy' detectada.")
             # La API de Highs es rápida pero a veces el log es por stdout
             solver = pulp.HiGHS(
                 timeLimit=time_limit_sec,
@@ -61,7 +60,7 @@ def run():
                 }
             )
         except ImportError:
-            print("⚠️ Highs no encontrado. Usando CBC (Fallback Single-Thread).")
+            print("[WARN] Highs no encontrado. Usando CBC (Fallback Single-Thread).")
             solver = pulp.PULP_CBC_CMD(
                 timeLimit=time_limit_sec,
                 msg=True,
@@ -82,8 +81,8 @@ def run():
     status = pulp.LpStatus[prob.status]
     obj_val = pulp.value(prob.objective)
 
-    print("✅ Solver finalizado. Generando reporte de cell9_report.py inmediato...")
-    cell9_report.run()
+    print("[OK] Solver finalizado. Generando reporte de cell9_report.py inmediato...")
+    reporting.run()
     
     print(f"\n--- SOLVER FINALIZADO ---")
     print(f"Estado Final: {status}")

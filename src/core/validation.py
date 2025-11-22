@@ -1,7 +1,7 @@
 # cell10_checker.py  -- comprobaciones exhaustivas de factibilidad y reporte
 # (Versión actualizada para incluir Eq. 8, 13, 14 y Setting Time por tipo)
 
-import data
+from src import context as data
 import pandas as pd
 
 

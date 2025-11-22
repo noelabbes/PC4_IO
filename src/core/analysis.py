@@ -1,5 +1,5 @@
 # cell9_reconstruct.py : Reconstrucción de solución entera para time-indexed
-import data
+from src import context as data
 import pandas as pd
 
 def run():
