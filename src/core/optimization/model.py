@@ -195,6 +195,15 @@ def run():
         pulp.lpSum(Slacks_Lag.values()) +
         pulp.lpSum(Slacks_MaxTard.values())
     )
+
+    # --- Restricción de Enlace (Big-M implícito) ---
+    # Si el camión v hace algún viaje, V_used[v] debe ser 1.
+    for v_idx in range(len(trucks)):
+        # Sumamos todas las variables Y de este camión
+        trips_of_truck = pulp.lpSum(Y_by_v[v_idx])
+        # Restricción: La suma de viajes <= (Gran Numero) * V_used
+        # Como maximo un camion hace ~10 viajes, M=100 es suficiente y seguro.
+        prob += trips_of_truck <= 100 * V_used[v_idx], f"Link_Vused_v{v_idx}"
     
     prob += alpha * (transp_cost + fixed_costs) + beta * pulp.lpSum(T_tard.values()) + slack_cost
 
