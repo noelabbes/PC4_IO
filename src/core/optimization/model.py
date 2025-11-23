@@ -173,6 +173,8 @@ def run():
             # Eq 14 (SOFT): Lag Máximo (Juntas frías)
             prob += start_next - finish_curr <= max_lag + Slacks_Lag[(site, i)], f"Eq14_Lag_{site}_{i}"
 
+    # --- Obtención de alpha y beta ---
+    
     alpha = params.get("alpha", 1.0)
     beta = params.get("beta", 1.0)
     
